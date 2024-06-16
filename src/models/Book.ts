@@ -2,17 +2,20 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 interface IBook extends Document {
     title: string;
+    author: string;
     genre: string;
-    quantity: number;
+    totalCopies: number;
+    availableCopies: number;
 }
 
-const bookSchema = new Schema({
+const bookSchema: Schema<IBook> = new Schema({
     title: { type: String, required: true },
+    author: { type: String, required: true },
     genre: { type: String, required: true },
-    quantity: { type: Number, required: true }
+    totalCopies: { type: Number, required: true },
+    availableCopies: { type: Number, required: true },
 });
 
 const Book = mongoose.model<IBook>('Book', bookSchema);
 
 export default Book;
-

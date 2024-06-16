@@ -26,8 +26,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const bookSchema = new mongoose_1.Schema({
     title: { type: String, required: true },
+    author: { type: String, required: true },
     genre: { type: String, required: true },
-    quantity: { type: Number, required: true }
+    totalCopies: { type: Number, required: true },
+    availableCopies: { type: Number, required: true },
 });
 const Book = mongoose_1.default.model('Book', bookSchema);
 exports.default = Book;

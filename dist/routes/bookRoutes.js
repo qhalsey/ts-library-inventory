@@ -26,9 +26,11 @@ router.use(authMiddleware_1.default);
  * @description Create a new book
  * @access Public
  */
+// Create a new book
 router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const book = new Book_1.default(req.body);
+        const { title, author, genre, totalCopies } = req.body;
+        const book = new Book_1.default({ title, author, genre, totalCopies, availableCopies: totalCopies });
         yield book.save();
         res.status(201).send(book);
     }
@@ -48,6 +50,50 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         res.status(500).send(error);
+    }
+}));
+/**
+ * @route POST /checkout/:id
+ * @description Checkout a book by ID
+ * @access Public
+ */
+router.post('/checkout/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const book = yield Book_1.default.findById(req.params.id);
+        if (!book) {
+            return res.status(404).send({ error: 'Book not found' });
+        }
+        if (book.availableCopies < 1) {
+            return res.status(400).send({ error: 'No available copies' });
+        }
+        book.availableCopies -= 1;
+        yield book.save();
+        res.status(200).send(book);
+    }
+    catch (error) {
+        res.status(400).send(error);
+    }
+}));
+/**
+ * @route POST /return/:id
+ * @description Return a book by ID
+ * @access Public
+ */
+router.post('/return/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const book = yield Book_1.default.findById(req.params.id);
+        if (!book) {
+            return res.status(404).send({ error: 'Book not found' });
+        }
+        if (book.availableCopies >= book.totalCopies) {
+            return res.status(400).send({ error: 'All copies are already returned' });
+        }
+        book.availableCopies += 1;
+        yield book.save();
+        res.status(200).send(book);
+    }
+    catch (error) {
+        res.status(400).send(error);
     }
 }));
 /**
