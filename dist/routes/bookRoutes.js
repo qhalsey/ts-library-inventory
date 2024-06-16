@@ -66,7 +66,15 @@ router.post('/checkout/:id', (req, res) => __awaiter(void 0, void 0, void 0, fun
         if (book.availableCopies < 1) {
             return res.status(400).send({ error: 'No available copies' });
         }
+        if (book.checkedOutBy) {
+            return res.status(400).send({ error: 'Book is already checked out' });
+        }
+        const userId = req.user.id;
+        const returnDate = new Date();
+        returnDate.setDate(returnDate.getDate() + 14);
         book.availableCopies -= 1;
+        book.checkedOutBy = userId;
+        book.returnDate = returnDate;
         yield book.save();
         res.status(200).send(book);
     }
@@ -79,16 +87,19 @@ router.post('/checkout/:id', (req, res) => __awaiter(void 0, void 0, void 0, fun
  * @description Return a book by ID
  * @access Public
  */
+// Return a book
 router.post('/return/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const book = yield Book_1.default.findById(req.params.id);
         if (!book) {
             return res.status(404).send({ error: 'Book not found' });
         }
-        if (book.availableCopies >= book.totalCopies) {
-            return res.status(400).send({ error: 'All copies are already returned' });
+        if (!book.checkedOutBy) {
+            return res.status(400).send({ error: 'Book is not checked out' });
         }
         book.availableCopies += 1;
+        book.checkedOutBy = null;
+        book.returnDate = null;
         yield book.save();
         res.status(200).send(book);
     }

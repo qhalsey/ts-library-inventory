@@ -2,6 +2,7 @@ import { Router } from 'express';
 import bodyParser from 'body-parser';
 import Book from '../models/Book';
 import authMiddleware from '../middleware/authMiddleware';
+import { JwtPayload } from 'jsonwebtoken';
 
 // Create a router object
 const router = Router();
@@ -55,8 +56,19 @@ router.post('/checkout/:id', async (req, res) => {
         if (book.availableCopies < 1) {
             return res.status(400).send({ error: 'No available copies' });
         }
+        if (book.checkedOutBy) {
+            return res.status(400).send({ error: 'Book is already checked out' });
+        }
+
+        const userId = (req.user as JwtPayload).id;
+        const returnDate = new Date();
+        returnDate.setDate(returnDate.getDate() + 14);
+
         book.availableCopies -= 1;
+        book.checkedOutBy = userId;
+        book.returnDate = returnDate;
         await book.save();
+
         res.status(200).send(book);
     } catch (error) {
         res.status(400).send(error);
@@ -68,23 +80,27 @@ router.post('/checkout/:id', async (req, res) => {
  * @description Return a book by ID
  * @access Public
  */
+// Return a book
 router.post('/return/:id', async (req, res) => {
     try {
         const book = await Book.findById(req.params.id);
         if (!book) {
             return res.status(404).send({ error: 'Book not found' });
         }
-        if (book.availableCopies >= book.totalCopies) {
-            return res.status(400).send({ error: 'All copies are already returned' });
+        if (!book.checkedOutBy) {
+            return res.status(400).send({ error: 'Book is not checked out' });
         }
+
         book.availableCopies += 1;
+        book.checkedOutBy = null;
+        book.returnDate = null;
         await book.save();
+
         res.status(200).send(book);
     } catch (error) {
         res.status(400).send(error);
     }
 });
-
 /**
  * @route GET /books/:id
  * @description Get a book by ID

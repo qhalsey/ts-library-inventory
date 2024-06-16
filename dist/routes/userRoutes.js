@@ -16,6 +16,7 @@ const express_1 = require("express");
 const body_parser_1 = __importDefault(require("body-parser"));
 const User_1 = __importDefault(require("../models/User"));
 const authMiddleware_1 = __importDefault(require("../middleware/authMiddleware"));
+const Book_1 = __importDefault(require("../models/Book"));
 // Create a router object
 const router = (0, express_1.Router)();
 // Parse the request body
@@ -96,6 +97,16 @@ router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* 
             return res.status(404).send('User not found');
         }
         res.send(user);
+    }
+    catch (error) {
+        res.status(500).send(error);
+    }
+}));
+router.get('/:id/books', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.id;
+        const books = yield Book_1.default.find({ checkedOutBy: userId });
+        res.status(200).send(books);
     }
     catch (error) {
         res.status(500).send(error);
