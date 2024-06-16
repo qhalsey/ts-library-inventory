@@ -24,10 +24,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
+// Define the Book schema
 const bookSchema = new mongoose_1.Schema({
     title: { type: String, required: true },
+    author: { type: String, required: true },
     genre: { type: String, required: true },
-    quantity: { type: Number, required: true }
+    totalCopies: { type: Number, required: true },
+    availableCopies: { type: Number, required: true },
+    checkedOutBy: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', default: null },
+    returnDate: { type: Date, default: null },
 });
 const Book = mongoose_1.default.model('Book', bookSchema);
 exports.default = Book;

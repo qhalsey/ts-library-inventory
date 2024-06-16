@@ -2,6 +2,7 @@ import { Router } from 'express';
 import bodyParser from 'body-parser';
 import User from '../models/User';
 import authMiddleware from '../middleware/authMiddleware';
+import Book from '../models/Book';
 
 // Create a router object
 const router = Router();
@@ -85,6 +86,16 @@ router.delete('/:id', async (req, res) => {
             return res.status(404).send('User not found');
         }
         res.send(user);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+});
+
+router.get('/:id/books', async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const books = await Book.find({ checkedOutBy: userId });
+        res.status(200).send(books);
     } catch (error) {
         res.status(500).send(error);
     }

@@ -26,9 +26,11 @@ router.use(authMiddleware_1.default);
  * @description Create a new book
  * @access Public
  */
+// Create a new book
 router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const book = new Book_1.default(req.body);
+        const { title, author, genre, totalCopies } = req.body;
+        const book = new Book_1.default({ title, author, genre, totalCopies, availableCopies: totalCopies });
         yield book.save();
         res.status(201).send(book);
     }
@@ -48,6 +50,61 @@ router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         res.status(500).send(error);
+    }
+}));
+/**
+ * @route POST /checkout/:id
+ * @description Checkout a book by ID
+ * @access Public
+ */
+router.post('/checkout/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const book = yield Book_1.default.findById(req.params.id);
+        if (!book) {
+            return res.status(404).send({ error: 'Book not found' });
+        }
+        if (book.availableCopies < 1) {
+            return res.status(400).send({ error: 'No available copies' });
+        }
+        if (book.checkedOutBy) {
+            return res.status(400).send({ error: 'Book is already checked out' });
+        }
+        const userId = req.user.id;
+        const returnDate = new Date();
+        returnDate.setDate(returnDate.getDate() + 14);
+        book.availableCopies -= 1;
+        book.checkedOutBy = userId;
+        book.returnDate = returnDate;
+        yield book.save();
+        res.status(200).send(book);
+    }
+    catch (error) {
+        res.status(400).send(error);
+    }
+}));
+/**
+ * @route POST /return/:id
+ * @description Return a book by ID
+ * @access Public
+ */
+// Return a book
+router.post('/return/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const book = yield Book_1.default.findById(req.params.id);
+        if (!book) {
+            return res.status(404).send({ error: 'Book not found' });
+        }
+        if (!book.checkedOutBy) {
+            return res.status(400).send({ error: 'Book is not checked out' });
+        }
+        book.availableCopies += 1;
+        book.checkedOutBy = null;
+        book.returnDate = null;
+        yield book.save();
+        res.status(200).send(book);
+    }
+    catch (error) {
+        res.status(400).send(error);
     }
 }));
 /**
