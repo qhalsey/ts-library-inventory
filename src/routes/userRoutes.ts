@@ -1,19 +1,21 @@
-import { Router } from "express";
-import bodyParser from "body-parser";
-import User from "../models/User";
+import { Router } from 'express';
+import bodyParser from 'body-parser';
+import User from '../models/User';
+import authMiddleware from '../middleware/authMiddleware';
 
 // Create a router object
 const router = Router();
 
 // Parse the request body
 router.use(bodyParser.json());
+router.use(authMiddleware as any);
 
 /**
  * @route POST /users
  * @description Create a new user
  * @access Public
  */
-router.post("/", async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const user = new User(req.body);
         await user.save();
@@ -28,7 +30,7 @@ router.post("/", async (req, res) => {
  * @description Get all users
  * @access Public
  */
-router.get("/", async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const users = await User.find();
         res.send(users);
@@ -42,11 +44,11 @@ router.get("/", async (req, res) => {
  * @description Get a user by ID
  * @access Public
  */
-router.get("/:id", async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) {
-            return res.status(404).send("User not found");
+            return res.status(404).send('User not found');
         }
         res.send(user);
     } catch (error) {
@@ -59,11 +61,11 @@ router.get("/:id", async (req, res) => {
  * @description Update a user by ID
  * @access Public
  */
-router.patch("/:id", async (req, res) => {
+router.patch('/:id', async (req, res) => {
     try {
         const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!user) {
-            return res.status(404).send("User not found");
+            return res.status(404).send('User not found');
         }
         res.send(user);
     } catch (error) {
@@ -76,11 +78,11 @@ router.patch("/:id", async (req, res) => {
  * @description Delete a user by ID
  * @access Public
  */
-router.delete("/:id", async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) {
-            return res.status(404).send("User not found");
+            return res.status(404).send('User not found');
         }
         res.send(user);
     } catch (error) {

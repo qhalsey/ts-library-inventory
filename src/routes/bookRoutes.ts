@@ -1,19 +1,21 @@
-import { Router } from "express";
-import bodyParser from "body-parser";
-import Book from "../models/Book";
+import { Router } from 'express';
+import bodyParser from 'body-parser';
+import Book from '../models/Book';
+import authMiddleware from '../middleware/authMiddleware';
 
 // Create a router object
 const router = Router();
 
 // Parse the request body
 router.use(bodyParser.json());
+router.use(authMiddleware as any);
 
 /**
  * @route POST /books
  * @description Create a new book
  * @access Public
  */
-router.post("/", async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const book = new Book(req.body);
         await book.save();
@@ -28,7 +30,7 @@ router.post("/", async (req, res) => {
  * @description Get all books
  * @access Public
  */
-router.get("/", async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const books = await Book.find();
         res.send(books);
@@ -42,11 +44,11 @@ router.get("/", async (req, res) => {
  * @description Get a book by ID
  * @access Public
  */
-router.get("/:id", async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const book = await Book.findById(req.params.id);
         if (!book) {
-            return res.status(404).send("Book not found");
+            return res.status(404).send('Book not found');
         }
         res.send(book);
     } catch (error) {
@@ -59,11 +61,11 @@ router.get("/:id", async (req, res) => {
  * @description Update a book by ID
  * @access Public
  */
-router.patch("/:id", async (req, res) => {
+router.patch('/:id', async (req, res) => {
     try {
         const book = await Book.findByIdAndUpdate(req.params);
         if (!book) {
-            return res.status(404).send("Book not found");
+            return res.status(404).send('Book not found');
         }
         res.send(book);
     } catch (error) {
@@ -76,11 +78,11 @@ router.patch("/:id", async (req, res) => {
  * @description Delete a book by ID
  * @access Public
  */
-router.delete("/:id", async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const book = await Book.findByIdAndDelete(req.params.id);
         if (!book) {
-            return res.status(404).send("Book not found");
+            return res.status(404).send('Book not found');
         }
         res.send(book);
     } catch (error) {

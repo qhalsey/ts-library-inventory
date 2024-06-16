@@ -15,16 +15,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const body_parser_1 = __importDefault(require("body-parser"));
 const Book_1 = __importDefault(require("../models/Book"));
+const authMiddleware_1 = __importDefault(require("../middleware/authMiddleware"));
 // Create a router object
 const router = (0, express_1.Router)();
 // Parse the request body
 router.use(body_parser_1.default.json());
+router.use(authMiddleware_1.default);
 /**
  * @route POST /books
  * @description Create a new book
  * @access Public
  */
-router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const book = new Book_1.default(req.body);
         yield book.save();
@@ -39,7 +41,7 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
  * @description Get all books
  * @access Public
  */
-router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const books = yield Book_1.default.find();
         res.send(books);
@@ -53,11 +55,11 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
  * @description Get a book by ID
  * @access Public
  */
-router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const book = yield Book_1.default.findById(req.params.id);
         if (!book) {
-            return res.status(404).send("Book not found");
+            return res.status(404).send('Book not found');
         }
         res.send(book);
     }
@@ -70,11 +72,11 @@ router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
  * @description Update a book by ID
  * @access Public
  */
-router.patch("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const book = yield Book_1.default.findByIdAndUpdate(req.params);
         if (!book) {
-            return res.status(404).send("Book not found");
+            return res.status(404).send('Book not found');
         }
         res.send(book);
     }
@@ -87,11 +89,11 @@ router.patch("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* (
  * @description Delete a book by ID
  * @access Public
  */
-router.delete("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const book = yield Book_1.default.findByIdAndDelete(req.params.id);
         if (!book) {
-            return res.status(404).send("Book not found");
+            return res.status(404).send('Book not found');
         }
         res.send(book);
     }
