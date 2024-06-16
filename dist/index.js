@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
+const bookRoutes_1 = __importDefault(require("./routes/bookRoutes"));
 const app = (0, express_1.default)();
 app.use(body_parser_1.default.json());
 //Connect to MongoDB
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
     res.send("Hello World!");
 });
 app.use('/api/users', userRoutes_1.default);
+app.use('/api/books', bookRoutes_1.default);
 app.listen(3000, () => {
     console.log("Server is running on http://localhost:3000");
 });
