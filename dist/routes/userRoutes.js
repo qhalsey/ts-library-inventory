@@ -15,16 +15,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const body_parser_1 = __importDefault(require("body-parser"));
 const User_1 = __importDefault(require("../models/User"));
+const authMiddleware_1 = __importDefault(require("../middleware/authMiddleware"));
 // Create a router object
 const router = (0, express_1.Router)();
 // Parse the request body
 router.use(body_parser_1.default.json());
+router.use(authMiddleware_1.default);
 /**
  * @route POST /users
  * @description Create a new user
  * @access Public
  */
-router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = new User_1.default(req.body);
         yield user.save();
@@ -39,7 +41,7 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
  * @description Get all users
  * @access Public
  */
-router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield User_1.default.find();
         res.send(users);
@@ -53,11 +55,11 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
  * @description Get a user by ID
  * @access Public
  */
-router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield User_1.default.findById(req.params.id);
         if (!user) {
-            return res.status(404).send("User not found");
+            return res.status(404).send('User not found');
         }
         res.send(user);
     }
@@ -70,11 +72,11 @@ router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
  * @description Update a user by ID
  * @access Public
  */
-router.patch("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.patch('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield User_1.default.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!user) {
-            return res.status(404).send("User not found");
+            return res.status(404).send('User not found');
         }
         res.send(user);
     }
@@ -87,11 +89,11 @@ router.patch("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* (
  * @description Delete a user by ID
  * @access Public
  */
-router.delete("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.delete('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield User_1.default.findByIdAndDelete(req.params.id);
         if (!user) {
-            return res.status(404).send("User not found");
+            return res.status(404).send('User not found');
         }
         res.send(user);
     }

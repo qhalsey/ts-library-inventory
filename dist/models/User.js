@@ -22,13 +22,32 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const userScema = new mongoose_1.Schema({
-    username: { type: String, required: true },
+const auth_1 = require("../utils/auth");
+const userSchema = new mongoose_1.Schema({
+    username: { type: String, required: true, unique: true },
     email: { type: String, required: false },
     password: { type: String, required: true },
-    role: { type: String, required: true }
+    role: { type: String, required: true },
 });
-const User = mongoose_1.default.model('User', userScema);
+// Pre-save hook to hash the password before saving
+userSchema.pre('save', function (next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (this.isModified('password')) {
+            this.password = yield (0, auth_1.hashPassword)(this.password);
+        }
+        next();
+    });
+});
+const User = mongoose_1.default.model('User', userSchema);
 exports.default = User;
